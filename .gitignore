@@ -1,0 +1,9 @@
+.build
+example
+wayland-client-protocol.c
+wayland_client_protocol.so
+xdg-decoration-unstable-v1-client-protocol.c
+xdg-decoration-unstable-v1-client-protocol.h
+xdg-shell-client-protocol.c
+xdg-shell-client-protocol.h
+xdg_shell_client.so
