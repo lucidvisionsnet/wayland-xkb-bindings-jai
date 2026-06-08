@@ -28,7 +28,7 @@ ClientState :: struct {
 
 wl_seat_capabilities :: (data: *void, wl_seat: *Wayland.wl_seat, caps_: u32) #c_call {
   state := cast(*ClientState)data;
-  caps := cast(Wayland.wl_seat_capability)caps_;
+  caps := cast(Wayland.wl_seat_capability_e)caps_;
 
   if caps & .WL_SEAT_CAPABILITY_KEYBOARD {
     if !state.wl_keyboard {
@@ -51,7 +51,7 @@ wl_seat_listener := Wayland.wl_seat_listener.{
 
 wl_keyboard_keymap :: (data: *void, wl_keyboard: *Wayland.wl_keyboard, format: u32, fd: s32, size: u32) #c_call {
   state := cast(*ClientState)data;
-  if (format != xx Wayland.wl_keyboard_keymap_format.WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1) {
+  if (format != xx Wayland.wl_keyboard_keymap_format_e.WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1) {
       POSIX.close(fd);
       return;
   }
@@ -94,7 +94,7 @@ wl_keyboard_key :: (data: *void, wl_keyboard: *Wayland.wl_keyboard, serial: u32,
   keysym_buf: [128]u8;
   Wayland.xkb_keysym_get_name(sym, keysym_buf.data, keysym_buf.count);
 
-  action := ifx state == xx Wayland.wl_keyboard_key_state.WL_KEYBOARD_KEY_STATE_PRESSED then "pressed" else "released";
+  action := ifx state == xx Wayland.wl_keyboard_key_state_e.WL_KEYBOARD_KEY_STATE_PRESSED then "pressed" else "released";
   push_context {
     print("Key %: % (keysym %)\n", action, to_string(keysym_buf), sym);
   }
@@ -105,7 +105,7 @@ wl_keyboard_key :: (data: *void, wl_keyboard: *Wayland.wl_keyboard, serial: u32,
   // }
 
   // Exit on ESC.
-  if (state == xx Wayland.wl_keyboard_key_state.WL_KEYBOARD_KEY_STATE_PRESSED) && (sym == Wayland.XKB_KEY_Escape) {
+  if (state == xx Wayland.wl_keyboard_key_state_e.WL_KEYBOARD_KEY_STATE_PRESSED) && (sym == Wayland.XKB_KEY_Escape) {
       client_state.running = false;
   }
 }
@@ -178,7 +178,7 @@ draw_frame :: (state: *ClientState) -> *Wayland.wl_buffer #c_call {
     xx WIDTH_PX,
     xx HEIGHT_PX,
     xx pixel_stride,
-    xx Wayland.wl_shm_format.WL_SHM_FORMAT_XRGB8888);
+    xx Wayland.wl_shm_format_e.WL_SHM_FORMAT_XRGB8888);
   Wayland.wl_shm_pool_destroy(pool);
   POSIX.close(fd);
 
@@ -231,6 +231,8 @@ registry_global :: (data: *void, wl_registry: *Wayland.wl_registry, name: u32, i
 }
 
 main :: () {
+  Wayland.init_wayland_protocol_bindings();
+
   state: ClientState;
 
   state.xkb_context = Wayland.xkb_context_new(Wayland.xkb_context_flags.XKB_CONTEXT_NO_FLAGS);
@@ -262,7 +264,7 @@ main :: () {
       state.xdg_decoration_manager, state.xdg_toplevel);
     Wayland.zxdg_toplevel_decoration_v1_set_mode(
       state.xdg_toplevel_decoration,
-      xx Wayland.zxdg_toplevel_decoration_v1_mode.ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+      xx Wayland.zxdg_toplevel_decoration_v1_mode_e.ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
   }
   Wayland.xdg_toplevel_set_title(state.xdg_toplevel, "Jai Wayland Example");
   Wayland.xdg_toplevel_set_app_id(state.xdg_toplevel, "org.example.wayland.jai");
