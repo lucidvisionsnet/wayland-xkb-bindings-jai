@@ -1,6 +1,7 @@
-# wayland-xkb-jai
+# wayland-xkb-bindings-jai
 
-Jai bindings for Wayland clients and xkb.
+Jai bindings for [Wayland](https://wayland.freedesktop.org/docs/html/)
+protocols and [XKB](https://www.x.org/XKB/).
 
 # Usage
 
@@ -13,8 +14,7 @@ These bindings require `libwayland-client.so.0` and `libxkbcommon.so.0` to
 exist in your system library search path. Usage assumes that you are actually
 using Wayland and not X11.
 
-Clone this repo into a `modules/Wayland` folder in your modules search path.
-Then,
+Clone this repo into a folder in your modules path, say `Wayland`. Then,
 
 ```jai
 Wayland :: #import "Wayland";
@@ -38,46 +38,18 @@ captured by the window are printed to the terminal.
 
 # Generation
 
+The bindings-generation implementation requires the compiled
+[wayland-scanner-jai](https://github.com/lucidvisionsnet/wayland-scanner-jai)
+tool be discoverable on your PATH.
+
 If you don't already have it, install the xkb development library. On Ubuntu:
 
 ```
 sudo apt install libxkbcommon-dev
 ```
 
-Then, build the Jai wayland-scanner, and run the Jai bindings generator.
-
 ```
-jai scanner.jai
 jai generate.jai
 ```
 
 To see which XML files the generator is using, inspect generate.jai.
-
-The scanner and generator produce files that are `#load`'ed by module.jai.
-
-# Troubleshooting
-
-If `wl_display_connect` returns `null`, you may be running on X11. Check for
-this via
-
-```
-echo $XDG_SESSION_TYPE
-```
-
-If this reports X11, you may be able to enable Wayland via configuration. On
-Ubuntu:
-
-```
-sudo <editor> /etc/gdm3/custom.conf
-```
-
-and change `#WaylandEnable=false` to `WaylandEnable=true`.
-
-Then:
-
-```
-sudo systemctl restart gdm3
-```
-
-and at the login screen, search for a UI element to use Ubuntu Wayland. Select
-that and then log in.

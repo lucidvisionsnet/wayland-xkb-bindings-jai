@@ -20,7 +20,7 @@ run_jai_wayland_scanner :: () -> bool {
 
   command_builder: String_Builder;
   init_string_builder(*command_builder);
-  print_to_builder(*command_builder, "./scanner client --dont-emit-opaque-decls");
+  print_to_builder(*command_builder, "wayland-scanner-jai client --dont-emit-opaque-decls");
   for xmls { print_to_builder(*command_builder, " %", it); }
   print_to_builder(*command_builder, " "); // Extra byte for null termination.
   cmd := builder_to_string(*command_builder);
