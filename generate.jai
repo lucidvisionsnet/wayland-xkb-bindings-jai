@@ -1,17 +1,20 @@
 #import "Basic";
 BindingsGenerator :: #import "Bindings_Generator";
 BuildCpp :: #import "BuildCpp";
+Compiler :: #import "Compiler";
 POSIX :: #import "POSIX";
 
 #run generate_bindings();
 
 generate_bindings :: () -> bool {
-  if !run_jai_wayland_scanner() { return false; }
+  Compiler.set_build_options_dc(.{ do_output = false });
+
+  if !run_wayland_scanner_jai() { return false; }
   if !generate_wayland_bindings() { return false; }
   return generate_xkb_bindings();
 }
 
-run_jai_wayland_scanner :: () -> bool {
+run_wayland_scanner_jai :: () -> bool {
   xmls := string.[
     "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml",
     "/usr/share/wayland-protocols/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml",
@@ -20,7 +23,7 @@ run_jai_wayland_scanner :: () -> bool {
 
   command_builder: String_Builder;
   init_string_builder(*command_builder);
-  print_to_builder(*command_builder, "wayland-scanner-jai client --dont-emit-opaque-decls");
+  print_to_builder(*command_builder, "./wayland-scanner-jai client --dont-emit-opaque-decls");
   for xmls { print_to_builder(*command_builder, " %", it); }
   print_to_builder(*command_builder, " "); // Extra byte for null termination.
   cmd := builder_to_string(*command_builder);
