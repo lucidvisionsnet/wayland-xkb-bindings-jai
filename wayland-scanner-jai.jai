@@ -49,10 +49,12 @@ Enum :: struct {
   name_upper: string;
   comment: string;
   values: [..] *EnumValue;
+  is_bitfield: bool;
 }
 
 EnumValue :: struct {
   name: string;
+  // @todo(orphen): Make this a string? Then we could preserve hex literals.
   value: s64;
   comment: string;
   since: s64;
@@ -79,6 +81,7 @@ Message :: struct {
 
 Parameter :: struct {
   name: string;
+  // @todo(orphen): Make this an enum so we aren't comparing strings everywhere.
   type: string;
   nullable: bool;
   iface: string;
@@ -109,6 +112,10 @@ extract_enum :: (node: *Xml.Node) -> *Enum {
   new_enum.name_upper = copy_string(new_enum.name);
   String.to_upper_in_place(new_enum.name_upper);
 
+  is_bitfield: string;
+  is_bitfield, ok = get_attribute_value(node.attributes, "bitfield");
+  new_enum.is_bitfield = ok && is_bitfield == "true";
+
   for node.children {
     if it.name == {
       case "description";
@@ -127,14 +134,20 @@ extract_enum :: (node: *Xml.Node) -> *Enum {
         // Value names are only dealt with in their all-uppercase form, so we
         // convert them preemptively.
         String.to_upper_in_place(new_value.name);
-    
+
+        base := 10;
         value_str: string;
         value_str, ok = get_attribute_value(it.attributes, "value");
         if !ok {
           log_error("missing enum entry value\n");
           return null;
         }
-        new_value.value, ok = string_to_int(value_str);
+        if String.starts_with(value_str, "0x") || String.starts_with(value_str, "0X") {
+          value_str.data += 2;
+          value_str.count -= 2;
+          base = 16;
+        }
+        new_value.value, ok = string_to_int(value_str, base);
         if !ok {
           log_error("failed to convert enum value from string to int: %\n", value_str);
           return null;
@@ -413,18 +426,18 @@ emit_types_forward_declarations :: (protocol: *Protocol, messages: [..] *Message
 // We differ from the original scanner by appending a `_e` to the enum name.
 // The original scanner emits names that may conflict with function names in C,
 // but this isn't allowed in Jai.
-emit_enumerations :: (iface_name: string, iface_name_upper: string, enums: [..] *Enum, builder: *String_Builder) {
+emit_enumerations :: (iface: *Interface, with_validators: bool, builder: *String_Builder) {
   first := true;
-  for enums {
+  for iface.enums {
     if !first { print_to_builder(builder, "\n"); } else { first = false; }
 
-    print_to_builder(builder, "%_%_e :: enum u32 {\n", iface_name, it.name);
+    print_to_builder(builder, "%_%_e :: enum u32 {\n", iface.name, it.name);
     for value: it.values {
       // Some interfaces feature enums with values that are numbers, such as
       // `90`. The original scanner makes these valid C identifiers by prefixing
       // the value with the interface and enum name. We need to do the same to
       // make a valid Jai identifier.
-      print_to_builder(builder, "  %_%_% :: %;\n", iface_name_upper, it.name_upper, value.name, value.value);
+      print_to_builder(builder, "  %_%_% :: %;\n", iface.name_upper, it.name_upper, value.name, value.value);
     }
     print_to_builder(builder, "}\n");
 
@@ -432,9 +445,39 @@ emit_enumerations :: (iface_name: string, iface_name_upper: string, enums: [..] 
       if value.since == 1 { continue; }
       print_to_builder(builder,
                        "%_%_%_SINCE_VERSION: u32 : %;\n",
-                       iface_name_upper, it.name_upper, value.name, value.since);
+                       iface.name_upper, it.name_upper, value.name, value.since);
     }
+
+    if with_validators { emit_validator(iface, it, builder); }
   }
+}
+
+emit_validator :: (iface: *Interface, e: *Enum, builder: *String_Builder) {
+  print_to_builder(builder, "%_%_is_valid :: (value: u32, version: u32) -> bool {\n", iface.name, e.name);
+
+  if e.is_bitfield {
+    print_to_builder(builder, "  valid: u64 = 0;\n");
+    for e.values {
+      print_to_builder(
+        builder,
+        "  if version >= % { valid |= xx %_%_e.%_%_%; }\n",
+        it.since, iface.name, e.name, iface.name_upper, e.name_upper, it.name);
+    }
+    print_to_builder(builder, "  return (value & ~valid) == 0;\n");
+  } else {
+    print_to_builder(builder, "  if value == {\n");
+    for e.values {
+      // The original implementation conditionally performs a cast, but we just
+      // bake it in here for simplicity.
+      print_to_builder(
+        builder,
+        "    case cast(u32)%_%_e.%_%_%;\n      return version >= %;\n",
+        iface.name, e.name, iface.name_upper, e.name_upper, it.name, it.since);
+    }
+    print_to_builder(builder, "    case;\n      return false;\n  }\n");
+  }
+
+  print_to_builder(builder, "}\n");
 }
 
 emit_type :: (param: *Parameter, builder: *String_Builder) {
@@ -459,38 +502,54 @@ emit_type :: (param: *Parameter, builder: *String_Builder) {
   }
 }
 
-emit_structs :: (iface_name: string, messages: [..] *Message, builder: *String_Builder) {
+emit_structs :: (side: EmitFor, iface_name: string, messages: [..] *Message, builder: *String_Builder) {
   if messages.count == 0 { return; }
 
   // Emit struct definition with function pointer members.
-  print_to_builder(builder, "%_listener :: struct {\n", iface_name);
+  print_to_builder(builder, "%_% :: struct {\n", iface_name, ifx side == .CLIENT "listener" else "interface");
 
   for message: messages {
     print_to_builder(builder, "  %: #type (", message.name);
-    print_to_builder(builder, "data: *void, the_%: *%", iface_name, iface_name);
-    for param: message.params {
-      print_to_builder(builder, ", %: ", param.name);
+    if side == .CLIENT {
+      print_to_builder(builder, "data: *void, the_%: *%", iface_name, iface_name);
+    } else {
+      print_to_builder(builder, "client: *wl_client, resource: *wl_resource");
+    }
 
-      if param.type == "object" && param.iface == "" {
+    for param: message.params {
+      if side == .SERVER && param.type == "object" {
+        print_to_builder(builder, ", %: ", param.name);
+        print_to_builder(builder, "*wl_resource");
+      } else if side == .SERVER && param.type == "new_id" && param.iface == "" {
+        print_to_builder(builder, ", iface: *u8, version: u32");
+        print_to_builder(builder, ", %: ", param.name);
+        print_to_builder(builder, "u32");
+      } else if side == .CLIENT && param.type == "object" && param.iface == "" {
+        print_to_builder(builder, ", %: ", param.name);
         print_to_builder(builder, "*void");
-      } else if param.type == "new_id" {
+      } else if side == .CLIENT && param.type == "new_id" {
+        print_to_builder(builder, ", %: ", param.name);
         print_to_builder(builder, "*%", param.iface);
       } else {
+        print_to_builder(builder, ", %: ", param.name);
         emit_type(param, builder);
       }
     }
+
     print_to_builder(builder, ") -> void #c_call;\n");
   }
 
   print_to_builder(builder, "}\n\n");
 
-  // Emit listener registration declaration.
-  defn := #string EOS
+  if side == .CLIENT{
+    // Emit listener registration declaration.
+    defn := #string EOS
 %_add_listener :: (the_%: *%, listener: *%_listener, data: *void) -> s32 #c_call {
   return wl_proxy_add_listener(cast(*wl_proxy)the_%, xx listener, data);
 }
-  EOS;
-  print_to_builder(builder, defn, iface_name, iface_name, iface_name, iface_name, iface_name);
+    EOS;
+    print_to_builder(builder, defn, iface_name, iface_name, iface_name, iface_name, iface_name);
+  }
 }
 
 emit_opcodes :: (iface_name_upper: string, messages: [..] *Message, builder: *String_Builder) {
@@ -597,7 +656,8 @@ emit_stubs :: (iface_name: string, iface_name_upper: string, messages: [..] *Mes
                      iface_name, iface_name_upper, message.name_upper);
     if maybe_return_ident {
       if maybe_return_ident.iface {
-        print_to_builder(builder, ", *%_interface", maybe_return_ident.iface);
+        // Append `_instance` to disambiguate from type of the same name.
+        print_to_builder(builder, ", *%_interface_instance", maybe_return_ident.iface);
       } else {
         print_to_builder(builder, ", iface");
       }
@@ -664,7 +724,9 @@ emit_types :: (protocol: *Protocol, protocol_types_identifier: string, messages:
         case "new_id"; #through;
         case "object";
           if param.iface {
-            print_to_builder(builder, "  %[%] = *%_interface;\n", protocol_types_identifier, assign_to_index, param.iface);
+            // We append `_instance` here because elsewhere we disambiguate
+            // the struct typename from the global instance name.
+            print_to_builder(builder, "  %[%] = *%_interface_instance;\n", protocol_types_identifier, assign_to_index, param.iface);
           } else {
             print_to_builder(builder, "  %[%] = null;\n", protocol_types_identifier, assign_to_index);
           }
@@ -728,7 +790,35 @@ emit_messages :: (protocol_name: string, messages: [] *Message, iface: *Interfac
   print_to_builder(builder, "];\n\n");
 }
 
+emit_event_wrappers :: (iface_name: string, iface_name_upper: string, messages: [..] *Message, builder: *String_Builder) {
+  // Provide handrolled procedures elsewhere for the display object.
+  if iface_name == "wl_display" { return; }
+
+  for message: messages {
+    print_to_builder(builder, "%_send_% :: (resource: *wl_resource", iface_name, message.name);
+
+    for message.params {
+      print_to_builder(builder, ", %: ", it.name);
+      if it.type == {
+        case "new_id"; #through;
+        case "object";
+          print_to_builder(builder, "*wl_resource");
+        case;
+          emit_type(it, builder);
+      }
+    }
+    print_to_builder(builder, ") -> void #c_call {\n");
+    print_to_builder(builder, "  wl_resource_post_event(resource, %_%", iface_name_upper, message.name_upper);
+
+    for message.params {
+      print_to_builder(builder, ", %", it.name);
+    }
+    print_to_builder(builder, ");\n}\n\n");
+  }
+}
+
 emit_combined_header_and_code :: (
+  side: EmitFor,
   protocol: *Protocol,
   opaque_struct_types: *[..] string,
   builder: *String_Builder,
@@ -737,6 +827,11 @@ emit_combined_header_and_code :: (
   print_to_builder(builder, "// Protocol %\n\n", protocol.name);
   // -------------------------------------------------------
   // This part follows the original scanner's `emit_header`.
+
+  if side == .SERVER {
+    array_add(opaque_struct_types, "wl_client :: struct {};");
+    array_add(opaque_struct_types, "wl_resource :: struct {};");
+  }
 
   // Iterate through all interfaces and emit the opaque struct types.
   opaque_types: [..] string;
@@ -763,20 +858,34 @@ emit_combined_header_and_code :: (
 
     print_to_builder(builder, "// Interface %\n\n", iface.name);
 
-    emit_enumerations(iface.name, iface.name_upper, iface.enums, builder);
+    emit_enumerations(iface, side == .SERVER, builder);
     print_to_builder(builder, "\n");
 
-    emit_structs(iface.name, iface.events, builder);
-    print_to_builder(builder, "\n");
+    if side == .SERVER {
+      emit_structs(side, iface.name, iface.requests, builder);
+      print_to_builder(builder, "\n");
 
-    emit_opcodes(iface.name_upper, iface.requests, builder);
-    print_to_builder(builder, "\n");
+      emit_opcodes(iface.name_upper, iface.events, builder);
+      print_to_builder(builder, "\n");
 
-    emit_opcode_versions(iface.name_upper, iface.events, builder);
-    emit_opcode_versions(iface.name_upper, iface.requests, builder);
-    print_to_builder(builder, "\n");
+      emit_opcode_versions(iface.name_upper, iface.events, builder);
+      emit_opcode_versions(iface.name_upper, iface.requests, builder);
+      print_to_builder(builder, "\n");
 
-    emit_stubs(iface.name, iface.name_upper, iface.requests, builder);
+      emit_event_wrappers(iface.name, iface.name_upper, iface.events, builder);
+    } else {
+      emit_structs(side, iface.name, iface.events, builder);
+      print_to_builder(builder, "\n");
+
+      emit_opcodes(iface.name_upper, iface.requests, builder);
+      print_to_builder(builder, "\n");
+
+      emit_opcode_versions(iface.name_upper, iface.events, builder);
+      emit_opcode_versions(iface.name_upper, iface.requests, builder);
+      print_to_builder(builder, "\n");
+
+      emit_stubs(iface.name, iface.name_upper, iface.requests, builder);
+    }
   }
   print_to_builder(builder, "\n");
 
@@ -836,8 +945,10 @@ emit_combined_header_and_code :: (
   for iface: protocol.interfaces {
     emit_messages(protocol.name, iface.requests, iface, "requests", builder);
     emit_messages(protocol.name, iface.events, iface, "events", builder);
-
-    print_to_builder(builder, "%_interface := wl_interface.{\n  \"%\", %,\n",
+    // Note that Wayland often uses variable identifiers with names identical
+    // to their types. This works in C namespacing but not in Jai. We therefore
+    // append `_instance` to disambiguate the names.
+    print_to_builder(builder, "%_interface_instance := wl_interface.{\n  \"%\", %,\n",
                      iface.name, iface.name, iface.version);
 
     if iface.requests {
@@ -856,10 +967,16 @@ emit_combined_header_and_code :: (
   }
 }
 
+EmitFor :: enum {
+  CLIENT :: 0;
+  SERVER :: 1;
+}
+
 Config :: struct {
   input_pathnames: [..] string;
   output_pathname: string;
   dont_emit_opaque_decls: bool;
+  side: EmitFor;
   parse_args_ok: bool;
 }
 
@@ -896,9 +1013,9 @@ containing all generated protocol code in the directory this tool is run.
   } else {
     if args[1] == {
       case "client";
+        config.side = .CLIENT;
       case "server";
-        print("server-side code generation is currently not supported\n");
-        config.parse_args_ok = false;
+        config.side = .SERVER;
       case;
         print("wanted one of {client|server} on the command line, not %\n", args[1]);
         print(help_text, args[0]);
@@ -951,7 +1068,7 @@ EOS;
 
   // Individual protocol specifications consider types they don't define as
   // opaque, but when we combine multiple protocol specifications in a single
-  // output file, we get redeclaration errors if the same "opaque" type is
+  // output file, we get redeclaration errors if the same opaque type is
   // declared multiple times. So we collect supposed opaque types so that we
   // can deduplicate them across protocols before emitting them.
   opaque_struct_types: [..] string;
@@ -959,12 +1076,18 @@ EOS;
   for config.input_pathnames {
     log("processing file: %\n", it);
 
+    // @todo(orphen): Clean up `xml_bytes`. Have to be careful since
+    // `opaque_struc_types` has strings that point into it.
     xml_bytes, ok := File.read_entire_file(it);
     if !ok { log_error("failed to read XML file %\n", it); exit(1); }
 
+    // @todo(orphen): Clean up `xml`. Have to be careful for the same reason for
+    // `xml_bytes`.
     xml := Xml.parse_xml(xml_bytes);
     if !xml { log_error("failed to parse XML DOM\n"); exit(1); }
 
+    // @todo(orphen): Clean up `protocol`. Have to be careful for the same
+    // reason for `xml`.
     protocol: *Protocol;
     protocol, ok = build_protocol(xml);
     if !ok {
@@ -972,7 +1095,8 @@ EOS;
       exit(1);
     }
 
-    emit_combined_header_and_code(protocol, *opaque_struct_types, *builder, *defer_init_builder);
+    emit_combined_header_and_code(
+      config.side, protocol, *opaque_struct_types, *builder, *defer_init_builder);
   }
 
   if !config.dont_emit_opaque_decls {

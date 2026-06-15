@@ -49,13 +49,13 @@ xdg_wm_base_destroy :: (the_xdg_wm_base: *xdg_wm_base) -> void #c_call {
 
 xdg_wm_base_create_positioner :: (the_xdg_wm_base: *xdg_wm_base) -> *xdg_positioner #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_wm_base, XDG_WM_BASE_CREATE_POSITIONER, *xdg_positioner_interface, wl_proxy_get_version(cast(*wl_proxy)the_xdg_wm_base), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_wm_base, XDG_WM_BASE_CREATE_POSITIONER, *xdg_positioner_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_xdg_wm_base), 0, null);
   return cast(*xdg_positioner)id;
 }
 
 xdg_wm_base_get_xdg_surface :: (the_xdg_wm_base: *xdg_wm_base, surface: *wl_surface) -> *xdg_surface #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_wm_base, XDG_WM_BASE_GET_XDG_SURFACE, *xdg_surface_interface, wl_proxy_get_version(cast(*wl_proxy)the_xdg_wm_base), 0, null, surface);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_wm_base, XDG_WM_BASE_GET_XDG_SURFACE, *xdg_surface_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_xdg_wm_base), 0, null, surface);
   return cast(*xdg_surface)id;
 }
 
@@ -228,13 +228,13 @@ xdg_surface_destroy :: (the_xdg_surface: *xdg_surface) -> void #c_call {
 
 xdg_surface_get_toplevel :: (the_xdg_surface: *xdg_surface) -> *xdg_toplevel #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_surface, XDG_SURFACE_GET_TOPLEVEL, *xdg_toplevel_interface, wl_proxy_get_version(cast(*wl_proxy)the_xdg_surface), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_surface, XDG_SURFACE_GET_TOPLEVEL, *xdg_toplevel_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_xdg_surface), 0, null);
   return cast(*xdg_toplevel)id;
 }
 
 xdg_surface_get_popup :: (the_xdg_surface: *xdg_surface, parent: *xdg_surface, positioner: *xdg_positioner) -> *xdg_popup #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_surface, XDG_SURFACE_GET_POPUP, *xdg_popup_interface, wl_proxy_get_version(cast(*wl_proxy)the_xdg_surface), 0, null, parent, positioner);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_xdg_surface, XDG_SURFACE_GET_POPUP, *xdg_popup_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_xdg_surface), 0, null, parent, positioner);
   return cast(*xdg_popup)id;
 }
 
@@ -474,7 +474,7 @@ xdg_wm_base_events := wl_message.[
   {"ping", "u", xdg_shell_types.data + 0},
 ];
 
-xdg_wm_base_interface := wl_interface.{
+xdg_wm_base_interface_instance := wl_interface.{
   "xdg_wm_base", 7,
   4, xdg_wm_base_requests.data,
   1, xdg_wm_base_events.data,
@@ -493,7 +493,7 @@ xdg_positioner_requests := wl_message.[
   {"set_parent_configure", "3u", xdg_shell_types.data + 0},
 ];
 
-xdg_positioner_interface := wl_interface.{
+xdg_positioner_interface_instance := wl_interface.{
   "xdg_positioner", 7,
   10, xdg_positioner_requests.data,
   0, null,
@@ -511,7 +511,7 @@ xdg_surface_events := wl_message.[
   {"configure", "u", xdg_shell_types.data + 0},
 ];
 
-xdg_surface_interface := wl_interface.{
+xdg_surface_interface_instance := wl_interface.{
   "xdg_surface", 7,
   5, xdg_surface_requests.data,
   1, xdg_surface_events.data,
@@ -541,7 +541,7 @@ xdg_toplevel_events := wl_message.[
   {"wm_capabilities", "5a", xdg_shell_types.data + 0},
 ];
 
-xdg_toplevel_interface := wl_interface.{
+xdg_toplevel_interface_instance := wl_interface.{
   "xdg_toplevel", 7,
   14, xdg_toplevel_requests.data,
   4, xdg_toplevel_events.data,
@@ -559,7 +559,7 @@ xdg_popup_events := wl_message.[
   {"repositioned", "3u", xdg_shell_types.data + 0},
 ];
 
-xdg_popup_interface := wl_interface.{
+xdg_popup_interface_instance := wl_interface.{
   "xdg_popup", 7,
   3, xdg_popup_requests.data,
   3, xdg_popup_events.data,
@@ -595,7 +595,7 @@ zxdg_decoration_manager_v1_destroy :: (the_zxdg_decoration_manager_v1: *zxdg_dec
 
 zxdg_decoration_manager_v1_get_toplevel_decoration :: (the_zxdg_decoration_manager_v1: *zxdg_decoration_manager_v1, toplevel: *xdg_toplevel) -> *zxdg_toplevel_decoration_v1 #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_zxdg_decoration_manager_v1, ZXDG_DECORATION_MANAGER_V1_GET_TOPLEVEL_DECORATION, *zxdg_toplevel_decoration_v1_interface, wl_proxy_get_version(cast(*wl_proxy)the_zxdg_decoration_manager_v1), 0, null, toplevel);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_zxdg_decoration_manager_v1, ZXDG_DECORATION_MANAGER_V1_GET_TOPLEVEL_DECORATION, *zxdg_toplevel_decoration_v1_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_zxdg_decoration_manager_v1), 0, null, toplevel);
   return cast(*zxdg_toplevel_decoration_v1)id;
 }
 
@@ -660,7 +660,7 @@ zxdg_decoration_manager_v1_requests := wl_message.[
   {"get_toplevel_decoration", "no", xdg_decoration_unstable_v1_types.data + 1},
 ];
 
-zxdg_decoration_manager_v1_interface := wl_interface.{
+zxdg_decoration_manager_v1_interface_instance := wl_interface.{
   "zxdg_decoration_manager_v1", 1,
   2, zxdg_decoration_manager_v1_requests.data,
   0, null,
@@ -676,7 +676,7 @@ zxdg_toplevel_decoration_v1_events := wl_message.[
   {"configure", "u", xdg_decoration_unstable_v1_types.data + 0},
 ];
 
-zxdg_toplevel_decoration_v1_interface := wl_interface.{
+zxdg_toplevel_decoration_v1_interface_instance := wl_interface.{
   "zxdg_toplevel_decoration_v1", 1,
   3, zxdg_toplevel_decoration_v1_requests.data,
   1, zxdg_toplevel_decoration_v1_events.data,
@@ -724,13 +724,13 @@ wl_display_get_version :: (the_wl_display: *wl_display) -> u32 #c_call {
 
 wl_display_sync :: (the_wl_display: *wl_display) -> *wl_callback #c_call {
   callback: *wl_proxy;
-  callback = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_display, WL_DISPLAY_SYNC, *wl_callback_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_display), 0, null);
+  callback = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_display, WL_DISPLAY_SYNC, *wl_callback_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_display), 0, null);
   return cast(*wl_callback)callback;
 }
 
 wl_display_get_registry :: (the_wl_display: *wl_display) -> *wl_registry #c_call {
   registry: *wl_proxy;
-  registry = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_display, WL_DISPLAY_GET_REGISTRY, *wl_registry_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_display), 0, null);
+  registry = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_display, WL_DISPLAY_GET_REGISTRY, *wl_registry_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_display), 0, null);
   return cast(*wl_registry)registry;
 }
 
@@ -833,13 +833,13 @@ wl_compositor_destroy :: (the_wl_compositor: *wl_compositor) -> void #c_call {
 
 wl_compositor_create_surface :: (the_wl_compositor: *wl_compositor) -> *wl_surface #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_compositor, WL_COMPOSITOR_CREATE_SURFACE, *wl_surface_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_compositor), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_compositor, WL_COMPOSITOR_CREATE_SURFACE, *wl_surface_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_compositor), 0, null);
   return cast(*wl_surface)id;
 }
 
 wl_compositor_create_region :: (the_wl_compositor: *wl_compositor) -> *wl_region #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_compositor, WL_COMPOSITOR_CREATE_REGION, *wl_region_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_compositor), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_compositor, WL_COMPOSITOR_CREATE_REGION, *wl_region_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_compositor), 0, null);
   return cast(*wl_region)id;
 }
 
@@ -869,7 +869,7 @@ wl_shm_pool_get_version :: (the_wl_shm_pool: *wl_shm_pool) -> u32 #c_call {
 
 wl_shm_pool_create_buffer :: (the_wl_shm_pool: *wl_shm_pool, offset: s32, width: s32, height: s32, stride: s32, format: u32) -> *wl_buffer #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_shm_pool, WL_SHM_POOL_CREATE_BUFFER, *wl_buffer_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_shm_pool), 0, null, offset, width, height, stride, format);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_shm_pool, WL_SHM_POOL_CREATE_BUFFER, *wl_buffer_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_shm_pool), 0, null, offset, width, height, stride, format);
   return cast(*wl_buffer)id;
 }
 
@@ -892,112 +892,112 @@ wl_shm_error_e :: enum u32 {
 wl_shm_format_e :: enum u32 {
   WL_SHM_FORMAT_ARGB8888 :: 0;
   WL_SHM_FORMAT_XRGB8888 :: 1;
-  WL_SHM_FORMAT_C8 :: 0;
-  WL_SHM_FORMAT_RGB332 :: 0;
-  WL_SHM_FORMAT_BGR233 :: 0;
-  WL_SHM_FORMAT_XRGB4444 :: 0;
-  WL_SHM_FORMAT_XBGR4444 :: 0;
-  WL_SHM_FORMAT_RGBX4444 :: 0;
-  WL_SHM_FORMAT_BGRX4444 :: 0;
-  WL_SHM_FORMAT_ARGB4444 :: 0;
-  WL_SHM_FORMAT_ABGR4444 :: 0;
-  WL_SHM_FORMAT_RGBA4444 :: 0;
-  WL_SHM_FORMAT_BGRA4444 :: 0;
-  WL_SHM_FORMAT_XRGB1555 :: 0;
-  WL_SHM_FORMAT_XBGR1555 :: 0;
-  WL_SHM_FORMAT_RGBX5551 :: 0;
-  WL_SHM_FORMAT_BGRX5551 :: 0;
-  WL_SHM_FORMAT_ARGB1555 :: 0;
-  WL_SHM_FORMAT_ABGR1555 :: 0;
-  WL_SHM_FORMAT_RGBA5551 :: 0;
-  WL_SHM_FORMAT_BGRA5551 :: 0;
-  WL_SHM_FORMAT_RGB565 :: 0;
-  WL_SHM_FORMAT_BGR565 :: 0;
-  WL_SHM_FORMAT_RGB888 :: 0;
-  WL_SHM_FORMAT_BGR888 :: 0;
-  WL_SHM_FORMAT_XBGR8888 :: 0;
-  WL_SHM_FORMAT_RGBX8888 :: 0;
-  WL_SHM_FORMAT_BGRX8888 :: 0;
-  WL_SHM_FORMAT_ABGR8888 :: 0;
-  WL_SHM_FORMAT_RGBA8888 :: 0;
-  WL_SHM_FORMAT_BGRA8888 :: 0;
-  WL_SHM_FORMAT_XRGB2101010 :: 0;
-  WL_SHM_FORMAT_XBGR2101010 :: 0;
-  WL_SHM_FORMAT_RGBX1010102 :: 0;
-  WL_SHM_FORMAT_BGRX1010102 :: 0;
-  WL_SHM_FORMAT_ARGB2101010 :: 0;
-  WL_SHM_FORMAT_ABGR2101010 :: 0;
-  WL_SHM_FORMAT_RGBA1010102 :: 0;
-  WL_SHM_FORMAT_BGRA1010102 :: 0;
-  WL_SHM_FORMAT_YUYV :: 0;
-  WL_SHM_FORMAT_YVYU :: 0;
-  WL_SHM_FORMAT_UYVY :: 0;
-  WL_SHM_FORMAT_VYUY :: 0;
-  WL_SHM_FORMAT_AYUV :: 0;
-  WL_SHM_FORMAT_NV12 :: 0;
-  WL_SHM_FORMAT_NV21 :: 0;
-  WL_SHM_FORMAT_NV16 :: 0;
-  WL_SHM_FORMAT_NV61 :: 0;
-  WL_SHM_FORMAT_YUV410 :: 0;
-  WL_SHM_FORMAT_YVU410 :: 0;
-  WL_SHM_FORMAT_YUV411 :: 0;
-  WL_SHM_FORMAT_YVU411 :: 0;
-  WL_SHM_FORMAT_YUV420 :: 0;
-  WL_SHM_FORMAT_YVU420 :: 0;
-  WL_SHM_FORMAT_YUV422 :: 0;
-  WL_SHM_FORMAT_YVU422 :: 0;
-  WL_SHM_FORMAT_YUV444 :: 0;
-  WL_SHM_FORMAT_YVU444 :: 0;
-  WL_SHM_FORMAT_R8 :: 0;
-  WL_SHM_FORMAT_R16 :: 0;
-  WL_SHM_FORMAT_RG88 :: 0;
-  WL_SHM_FORMAT_GR88 :: 0;
-  WL_SHM_FORMAT_RG1616 :: 0;
-  WL_SHM_FORMAT_GR1616 :: 0;
-  WL_SHM_FORMAT_XRGB16161616F :: 0;
-  WL_SHM_FORMAT_XBGR16161616F :: 0;
-  WL_SHM_FORMAT_ARGB16161616F :: 0;
-  WL_SHM_FORMAT_ABGR16161616F :: 0;
-  WL_SHM_FORMAT_XYUV8888 :: 0;
-  WL_SHM_FORMAT_VUY888 :: 0;
-  WL_SHM_FORMAT_VUY101010 :: 0;
-  WL_SHM_FORMAT_Y210 :: 0;
-  WL_SHM_FORMAT_Y212 :: 0;
-  WL_SHM_FORMAT_Y216 :: 0;
-  WL_SHM_FORMAT_Y410 :: 0;
-  WL_SHM_FORMAT_Y412 :: 0;
-  WL_SHM_FORMAT_Y416 :: 0;
-  WL_SHM_FORMAT_XVYU2101010 :: 0;
-  WL_SHM_FORMAT_XVYU12_16161616 :: 0;
-  WL_SHM_FORMAT_XVYU16161616 :: 0;
-  WL_SHM_FORMAT_Y0L0 :: 0;
-  WL_SHM_FORMAT_X0L0 :: 0;
-  WL_SHM_FORMAT_Y0L2 :: 0;
-  WL_SHM_FORMAT_X0L2 :: 0;
-  WL_SHM_FORMAT_YUV420_8BIT :: 0;
-  WL_SHM_FORMAT_YUV420_10BIT :: 0;
-  WL_SHM_FORMAT_XRGB8888_A8 :: 0;
-  WL_SHM_FORMAT_XBGR8888_A8 :: 0;
-  WL_SHM_FORMAT_RGBX8888_A8 :: 0;
-  WL_SHM_FORMAT_BGRX8888_A8 :: 0;
-  WL_SHM_FORMAT_RGB888_A8 :: 0;
-  WL_SHM_FORMAT_BGR888_A8 :: 0;
-  WL_SHM_FORMAT_RGB565_A8 :: 0;
-  WL_SHM_FORMAT_BGR565_A8 :: 0;
-  WL_SHM_FORMAT_NV24 :: 0;
-  WL_SHM_FORMAT_NV42 :: 0;
-  WL_SHM_FORMAT_P210 :: 0;
-  WL_SHM_FORMAT_P010 :: 0;
-  WL_SHM_FORMAT_P012 :: 0;
-  WL_SHM_FORMAT_P016 :: 0;
-  WL_SHM_FORMAT_AXBXGXRX106106106106 :: 0;
-  WL_SHM_FORMAT_NV15 :: 0;
-  WL_SHM_FORMAT_Q410 :: 0;
-  WL_SHM_FORMAT_Q401 :: 0;
-  WL_SHM_FORMAT_XRGB16161616 :: 0;
-  WL_SHM_FORMAT_XBGR16161616 :: 0;
-  WL_SHM_FORMAT_ARGB16161616 :: 0;
-  WL_SHM_FORMAT_ABGR16161616 :: 0;
+  WL_SHM_FORMAT_C8 :: 538982467;
+  WL_SHM_FORMAT_RGB332 :: 943867730;
+  WL_SHM_FORMAT_BGR233 :: 944916290;
+  WL_SHM_FORMAT_XRGB4444 :: 842093144;
+  WL_SHM_FORMAT_XBGR4444 :: 842089048;
+  WL_SHM_FORMAT_RGBX4444 :: 842094674;
+  WL_SHM_FORMAT_BGRX4444 :: 842094658;
+  WL_SHM_FORMAT_ARGB4444 :: 842093121;
+  WL_SHM_FORMAT_ABGR4444 :: 842089025;
+  WL_SHM_FORMAT_RGBA4444 :: 842088786;
+  WL_SHM_FORMAT_BGRA4444 :: 842088770;
+  WL_SHM_FORMAT_XRGB1555 :: 892424792;
+  WL_SHM_FORMAT_XBGR1555 :: 892420696;
+  WL_SHM_FORMAT_RGBX5551 :: 892426322;
+  WL_SHM_FORMAT_BGRX5551 :: 892426306;
+  WL_SHM_FORMAT_ARGB1555 :: 892424769;
+  WL_SHM_FORMAT_ABGR1555 :: 892420673;
+  WL_SHM_FORMAT_RGBA5551 :: 892420434;
+  WL_SHM_FORMAT_BGRA5551 :: 892420418;
+  WL_SHM_FORMAT_RGB565 :: 909199186;
+  WL_SHM_FORMAT_BGR565 :: 909199170;
+  WL_SHM_FORMAT_RGB888 :: 875710290;
+  WL_SHM_FORMAT_BGR888 :: 875710274;
+  WL_SHM_FORMAT_XBGR8888 :: 875709016;
+  WL_SHM_FORMAT_RGBX8888 :: 875714642;
+  WL_SHM_FORMAT_BGRX8888 :: 875714626;
+  WL_SHM_FORMAT_ABGR8888 :: 875708993;
+  WL_SHM_FORMAT_RGBA8888 :: 875708754;
+  WL_SHM_FORMAT_BGRA8888 :: 875708738;
+  WL_SHM_FORMAT_XRGB2101010 :: 808669784;
+  WL_SHM_FORMAT_XBGR2101010 :: 808665688;
+  WL_SHM_FORMAT_RGBX1010102 :: 808671314;
+  WL_SHM_FORMAT_BGRX1010102 :: 808671298;
+  WL_SHM_FORMAT_ARGB2101010 :: 808669761;
+  WL_SHM_FORMAT_ABGR2101010 :: 808665665;
+  WL_SHM_FORMAT_RGBA1010102 :: 808665426;
+  WL_SHM_FORMAT_BGRA1010102 :: 808665410;
+  WL_SHM_FORMAT_YUYV :: 1448695129;
+  WL_SHM_FORMAT_YVYU :: 1431918169;
+  WL_SHM_FORMAT_UYVY :: 1498831189;
+  WL_SHM_FORMAT_VYUY :: 1498765654;
+  WL_SHM_FORMAT_AYUV :: 1448433985;
+  WL_SHM_FORMAT_NV12 :: 842094158;
+  WL_SHM_FORMAT_NV21 :: 825382478;
+  WL_SHM_FORMAT_NV16 :: 909203022;
+  WL_SHM_FORMAT_NV61 :: 825644622;
+  WL_SHM_FORMAT_YUV410 :: 961959257;
+  WL_SHM_FORMAT_YVU410 :: 961893977;
+  WL_SHM_FORMAT_YUV411 :: 825316697;
+  WL_SHM_FORMAT_YVU411 :: 825316953;
+  WL_SHM_FORMAT_YUV420 :: 842093913;
+  WL_SHM_FORMAT_YVU420 :: 842094169;
+  WL_SHM_FORMAT_YUV422 :: 909202777;
+  WL_SHM_FORMAT_YVU422 :: 909203033;
+  WL_SHM_FORMAT_YUV444 :: 875713881;
+  WL_SHM_FORMAT_YVU444 :: 875714137;
+  WL_SHM_FORMAT_R8 :: 538982482;
+  WL_SHM_FORMAT_R16 :: 540422482;
+  WL_SHM_FORMAT_RG88 :: 943212370;
+  WL_SHM_FORMAT_GR88 :: 943215175;
+  WL_SHM_FORMAT_RG1616 :: 842221394;
+  WL_SHM_FORMAT_GR1616 :: 842224199;
+  WL_SHM_FORMAT_XRGB16161616F :: 1211388504;
+  WL_SHM_FORMAT_XBGR16161616F :: 1211384408;
+  WL_SHM_FORMAT_ARGB16161616F :: 1211388481;
+  WL_SHM_FORMAT_ABGR16161616F :: 1211384385;
+  WL_SHM_FORMAT_XYUV8888 :: 1448434008;
+  WL_SHM_FORMAT_VUY888 :: 875713878;
+  WL_SHM_FORMAT_VUY101010 :: 808670550;
+  WL_SHM_FORMAT_Y210 :: 808530521;
+  WL_SHM_FORMAT_Y212 :: 842084953;
+  WL_SHM_FORMAT_Y216 :: 909193817;
+  WL_SHM_FORMAT_Y410 :: 808531033;
+  WL_SHM_FORMAT_Y412 :: 842085465;
+  WL_SHM_FORMAT_Y416 :: 909194329;
+  WL_SHM_FORMAT_XVYU2101010 :: 808670808;
+  WL_SHM_FORMAT_XVYU12_16161616 :: 909334104;
+  WL_SHM_FORMAT_XVYU16161616 :: 942954072;
+  WL_SHM_FORMAT_Y0L0 :: 810299481;
+  WL_SHM_FORMAT_X0L0 :: 810299480;
+  WL_SHM_FORMAT_Y0L2 :: 843853913;
+  WL_SHM_FORMAT_X0L2 :: 843853912;
+  WL_SHM_FORMAT_YUV420_8BIT :: 942691673;
+  WL_SHM_FORMAT_YUV420_10BIT :: 808539481;
+  WL_SHM_FORMAT_XRGB8888_A8 :: 943805016;
+  WL_SHM_FORMAT_XBGR8888_A8 :: 943800920;
+  WL_SHM_FORMAT_RGBX8888_A8 :: 943806546;
+  WL_SHM_FORMAT_BGRX8888_A8 :: 943806530;
+  WL_SHM_FORMAT_RGB888_A8 :: 943798354;
+  WL_SHM_FORMAT_BGR888_A8 :: 943798338;
+  WL_SHM_FORMAT_RGB565_A8 :: 943797586;
+  WL_SHM_FORMAT_BGR565_A8 :: 943797570;
+  WL_SHM_FORMAT_NV24 :: 875714126;
+  WL_SHM_FORMAT_NV42 :: 842290766;
+  WL_SHM_FORMAT_P210 :: 808530512;
+  WL_SHM_FORMAT_P010 :: 808530000;
+  WL_SHM_FORMAT_P012 :: 842084432;
+  WL_SHM_FORMAT_P016 :: 909193296;
+  WL_SHM_FORMAT_AXBXGXRX106106106106 :: 808534593;
+  WL_SHM_FORMAT_NV15 :: 892425806;
+  WL_SHM_FORMAT_Q410 :: 808531025;
+  WL_SHM_FORMAT_Q401 :: 825242705;
+  WL_SHM_FORMAT_XRGB16161616 :: 942953048;
+  WL_SHM_FORMAT_XBGR16161616 :: 942948952;
+  WL_SHM_FORMAT_ARGB16161616 :: 942953025;
+  WL_SHM_FORMAT_ABGR16161616 :: 942948929;
 }
 
 wl_shm_listener :: struct {
@@ -1031,7 +1031,7 @@ wl_shm_destroy :: (the_wl_shm: *wl_shm) -> void #c_call {
 
 wl_shm_create_pool :: (the_wl_shm: *wl_shm, fd: s32, size: s32) -> *wl_shm_pool #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_shm, WL_SHM_CREATE_POOL, *wl_shm_pool_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_shm), 0, null, fd, size);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_shm, WL_SHM_CREATE_POOL, *wl_shm_pool_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_shm), 0, null, fd, size);
   return cast(*wl_shm_pool)id;
 }
 
@@ -1286,13 +1286,13 @@ wl_data_device_manager_destroy :: (the_wl_data_device_manager: *wl_data_device_m
 
 wl_data_device_manager_create_data_source :: (the_wl_data_device_manager: *wl_data_device_manager) -> *wl_data_source #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_data_device_manager, WL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE, *wl_data_source_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_data_device_manager), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_data_device_manager, WL_DATA_DEVICE_MANAGER_CREATE_DATA_SOURCE, *wl_data_source_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_data_device_manager), 0, null);
   return cast(*wl_data_source)id;
 }
 
 wl_data_device_manager_get_data_device :: (the_wl_data_device_manager: *wl_data_device_manager, seat: *wl_seat) -> *wl_data_device #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_data_device_manager, WL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE, *wl_data_device_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_data_device_manager), 0, null, seat);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_data_device_manager, WL_DATA_DEVICE_MANAGER_GET_DATA_DEVICE, *wl_data_device_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_data_device_manager), 0, null, seat);
   return cast(*wl_data_device)id;
 }
 
@@ -1325,7 +1325,7 @@ wl_shell_destroy :: (the_wl_shell: *wl_shell) -> void #c_call {
 
 wl_shell_get_shell_surface :: (the_wl_shell: *wl_shell, surface: *wl_surface) -> *wl_shell_surface #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_shell, WL_SHELL_GET_SHELL_SURFACE, *wl_shell_surface_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_shell), 0, null, surface);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_shell, WL_SHELL_GET_SHELL_SURFACE, *wl_shell_surface_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_shell), 0, null, surface);
   return cast(*wl_shell_surface)id;
 }
 
@@ -1344,7 +1344,7 @@ wl_shell_surface_resize_e :: enum u32 {
 }
 
 wl_shell_surface_transient_e :: enum u32 {
-  WL_SHELL_SURFACE_TRANSIENT_INACTIVE :: 0;
+  WL_SHELL_SURFACE_TRANSIENT_INACTIVE :: 1;
 }
 
 wl_shell_surface_fullscreen_method_e :: enum u32 {
@@ -1520,7 +1520,7 @@ wl_surface_damage :: (the_wl_surface: *wl_surface, x: s32, y: s32, width: s32, h
 
 wl_surface_frame :: (the_wl_surface: *wl_surface) -> *wl_callback #c_call {
   callback: *wl_proxy;
-  callback = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_surface, WL_SURFACE_FRAME, *wl_callback_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_surface), 0, null);
+  callback = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_surface, WL_SURFACE_FRAME, *wl_callback_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_surface), 0, null);
   return cast(*wl_callback)callback;
 }
 
@@ -1603,19 +1603,19 @@ wl_seat_destroy :: (the_wl_seat: *wl_seat) -> void #c_call {
 
 wl_seat_get_pointer :: (the_wl_seat: *wl_seat) -> *wl_pointer #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_seat, WL_SEAT_GET_POINTER, *wl_pointer_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_seat), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_seat, WL_SEAT_GET_POINTER, *wl_pointer_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_seat), 0, null);
   return cast(*wl_pointer)id;
 }
 
 wl_seat_get_keyboard :: (the_wl_seat: *wl_seat) -> *wl_keyboard #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_seat, WL_SEAT_GET_KEYBOARD, *wl_keyboard_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_seat), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_seat, WL_SEAT_GET_KEYBOARD, *wl_keyboard_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_seat), 0, null);
   return cast(*wl_keyboard)id;
 }
 
 wl_seat_get_touch :: (the_wl_seat: *wl_seat) -> *wl_touch #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_seat, WL_SEAT_GET_TOUCH, *wl_touch_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_seat), 0, null);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_seat, WL_SEAT_GET_TOUCH, *wl_touch_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_seat), 0, null);
   return cast(*wl_touch)id;
 }
 
@@ -1837,8 +1837,8 @@ wl_output_transform_e :: enum u32 {
 }
 
 wl_output_mode_e :: enum u32 {
-  WL_OUTPUT_MODE_CURRENT :: 0;
-  WL_OUTPUT_MODE_PREFERRED :: 0;
+  WL_OUTPUT_MODE_CURRENT :: 1;
+  WL_OUTPUT_MODE_PREFERRED :: 2;
 }
 
 wl_output_listener :: struct {
@@ -1952,7 +1952,7 @@ wl_subcompositor_destroy :: (the_wl_subcompositor: *wl_subcompositor) -> void #c
 
 wl_subcompositor_get_subsurface :: (the_wl_subcompositor: *wl_subcompositor, surface: *wl_surface, parent: *wl_surface) -> *wl_subsurface #c_call {
   id: *wl_proxy;
-  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_subcompositor, WL_SUBCOMPOSITOR_GET_SUBSURFACE, *wl_subsurface_interface, wl_proxy_get_version(cast(*wl_proxy)the_wl_subcompositor), 0, null, surface, parent);
+  id = wl_proxy_marshal_flags(cast(*wl_proxy)the_wl_subcompositor, WL_SUBCOMPOSITOR_GET_SUBSURFACE, *wl_subsurface_interface_instance, wl_proxy_get_version(cast(*wl_proxy)the_wl_subcompositor), 0, null, surface, parent);
   return cast(*wl_subsurface)id;
 }
 
@@ -2024,7 +2024,7 @@ wl_display_events := wl_message.[
   {"delete_id", "u", wayland_types.data + 0},
 ];
 
-wl_display_interface := wl_interface.{
+wl_display_interface_instance := wl_interface.{
   "wl_display", 1,
   2, wl_display_requests.data,
   2, wl_display_events.data,
@@ -2039,7 +2039,7 @@ wl_registry_events := wl_message.[
   {"global_remove", "u", wayland_types.data + 0},
 ];
 
-wl_registry_interface := wl_interface.{
+wl_registry_interface_instance := wl_interface.{
   "wl_registry", 1,
   1, wl_registry_requests.data,
   2, wl_registry_events.data,
@@ -2049,7 +2049,7 @@ wl_callback_events := wl_message.[
   {"done", "u", wayland_types.data + 0},
 ];
 
-wl_callback_interface := wl_interface.{
+wl_callback_interface_instance := wl_interface.{
   "wl_callback", 1,
   0, null,
   1, wl_callback_events.data,
@@ -2060,7 +2060,7 @@ wl_compositor_requests := wl_message.[
   {"create_region", "n", wayland_types.data + 11},
 ];
 
-wl_compositor_interface := wl_interface.{
+wl_compositor_interface_instance := wl_interface.{
   "wl_compositor", 6,
   2, wl_compositor_requests.data,
   0, null,
@@ -2072,7 +2072,7 @@ wl_shm_pool_requests := wl_message.[
   {"resize", "i", wayland_types.data + 0},
 ];
 
-wl_shm_pool_interface := wl_interface.{
+wl_shm_pool_interface_instance := wl_interface.{
   "wl_shm_pool", 1,
   3, wl_shm_pool_requests.data,
   0, null,
@@ -2086,7 +2086,7 @@ wl_shm_events := wl_message.[
   {"format", "u", wayland_types.data + 0},
 ];
 
-wl_shm_interface := wl_interface.{
+wl_shm_interface_instance := wl_interface.{
   "wl_shm", 1,
   1, wl_shm_requests.data,
   1, wl_shm_events.data,
@@ -2100,7 +2100,7 @@ wl_buffer_events := wl_message.[
   {"release", "", wayland_types.data + 0},
 ];
 
-wl_buffer_interface := wl_interface.{
+wl_buffer_interface_instance := wl_interface.{
   "wl_buffer", 1,
   1, wl_buffer_requests.data,
   1, wl_buffer_events.data,
@@ -2120,7 +2120,7 @@ wl_data_offer_events := wl_message.[
   {"action", "3u", wayland_types.data + 0},
 ];
 
-wl_data_offer_interface := wl_interface.{
+wl_data_offer_interface_instance := wl_interface.{
   "wl_data_offer", 3,
   5, wl_data_offer_requests.data,
   3, wl_data_offer_events.data,
@@ -2141,7 +2141,7 @@ wl_data_source_events := wl_message.[
   {"action", "3u", wayland_types.data + 0},
 ];
 
-wl_data_source_interface := wl_interface.{
+wl_data_source_interface_instance := wl_interface.{
   "wl_data_source", 3,
   3, wl_data_source_requests.data,
   6, wl_data_source_events.data,
@@ -2162,7 +2162,7 @@ wl_data_device_events := wl_message.[
   {"selection", "?o", wayland_types.data + 33},
 ];
 
-wl_data_device_interface := wl_interface.{
+wl_data_device_interface_instance := wl_interface.{
   "wl_data_device", 3,
   3, wl_data_device_requests.data,
   6, wl_data_device_events.data,
@@ -2173,7 +2173,7 @@ wl_data_device_manager_requests := wl_message.[
   {"get_data_device", "no", wayland_types.data + 35},
 ];
 
-wl_data_device_manager_interface := wl_interface.{
+wl_data_device_manager_interface_instance := wl_interface.{
   "wl_data_device_manager", 3,
   2, wl_data_device_manager_requests.data,
   0, null,
@@ -2183,7 +2183,7 @@ wl_shell_requests := wl_message.[
   {"get_shell_surface", "no", wayland_types.data + 37},
 ];
 
-wl_shell_interface := wl_interface.{
+wl_shell_interface_instance := wl_interface.{
   "wl_shell", 1,
   1, wl_shell_requests.data,
   0, null,
@@ -2208,7 +2208,7 @@ wl_shell_surface_events := wl_message.[
   {"popup_done", "", wayland_types.data + 0},
 ];
 
-wl_shell_surface_interface := wl_interface.{
+wl_shell_surface_interface_instance := wl_interface.{
   "wl_shell_surface", 1,
   10, wl_shell_surface_requests.data,
   3, wl_shell_surface_events.data,
@@ -2235,7 +2235,7 @@ wl_surface_events := wl_message.[
   {"preferred_buffer_transform", "6u", wayland_types.data + 0},
 ];
 
-wl_surface_interface := wl_interface.{
+wl_surface_interface_instance := wl_interface.{
   "wl_surface", 6,
   11, wl_surface_requests.data,
   4, wl_surface_events.data,
@@ -2253,7 +2253,7 @@ wl_seat_events := wl_message.[
   {"name", "2s", wayland_types.data + 0},
 ];
 
-wl_seat_interface := wl_interface.{
+wl_seat_interface_instance := wl_interface.{
   "wl_seat", 9,
   4, wl_seat_requests.data,
   2, wl_seat_events.data,
@@ -2278,7 +2278,7 @@ wl_pointer_events := wl_message.[
   {"axis_relative_direction", "9uu", wayland_types.data + 0},
 ];
 
-wl_pointer_interface := wl_interface.{
+wl_pointer_interface_instance := wl_interface.{
   "wl_pointer", 9,
   2, wl_pointer_requests.data,
   11, wl_pointer_events.data,
@@ -2297,7 +2297,7 @@ wl_keyboard_events := wl_message.[
   {"repeat_info", "4ii", wayland_types.data + 0},
 ];
 
-wl_keyboard_interface := wl_interface.{
+wl_keyboard_interface_instance := wl_interface.{
   "wl_keyboard", 9,
   1, wl_keyboard_requests.data,
   6, wl_keyboard_events.data,
@@ -2317,7 +2317,7 @@ wl_touch_events := wl_message.[
   {"orientation", "6if", wayland_types.data + 0},
 ];
 
-wl_touch_interface := wl_interface.{
+wl_touch_interface_instance := wl_interface.{
   "wl_touch", 9,
   1, wl_touch_requests.data,
   7, wl_touch_events.data,
@@ -2336,7 +2336,7 @@ wl_output_events := wl_message.[
   {"description", "4s", wayland_types.data + 0},
 ];
 
-wl_output_interface := wl_interface.{
+wl_output_interface_instance := wl_interface.{
   "wl_output", 4,
   1, wl_output_requests.data,
   6, wl_output_events.data,
@@ -2348,7 +2348,7 @@ wl_region_requests := wl_message.[
   {"subtract", "iiii", wayland_types.data + 0},
 ];
 
-wl_region_interface := wl_interface.{
+wl_region_interface_instance := wl_interface.{
   "wl_region", 1,
   3, wl_region_requests.data,
   0, null,
@@ -2359,7 +2359,7 @@ wl_subcompositor_requests := wl_message.[
   {"get_subsurface", "noo", wayland_types.data + 90},
 ];
 
-wl_subcompositor_interface := wl_interface.{
+wl_subcompositor_interface_instance := wl_interface.{
   "wl_subcompositor", 1,
   2, wl_subcompositor_requests.data,
   0, null,
@@ -2374,7 +2374,7 @@ wl_subsurface_requests := wl_message.[
   {"set_desync", "", wayland_types.data + 0},
 ];
 
-wl_subsurface_interface := wl_interface.{
+wl_subsurface_interface_instance := wl_interface.{
   "wl_subsurface", 1,
   6, wl_subsurface_requests.data,
   0, null,
@@ -2389,32 +2389,32 @@ init_wayland_protocol_bindings :: () {
   xdg_shell_types[1] = null;
   xdg_shell_types[2] = null;
   xdg_shell_types[3] = null;
-  xdg_shell_types[4] = *xdg_positioner_interface;
-  xdg_shell_types[5] = *xdg_surface_interface;
-  xdg_shell_types[6] = *wl_surface_interface;
-  xdg_shell_types[7] = *xdg_toplevel_interface;
-  xdg_shell_types[8] = *xdg_popup_interface;
-  xdg_shell_types[9] = *xdg_surface_interface;
-  xdg_shell_types[10] = *xdg_positioner_interface;
-  xdg_shell_types[11] = *xdg_toplevel_interface;
-  xdg_shell_types[12] = *wl_seat_interface;
+  xdg_shell_types[4] = *xdg_positioner_interface_instance;
+  xdg_shell_types[5] = *xdg_surface_interface_instance;
+  xdg_shell_types[6] = *wl_surface_interface_instance;
+  xdg_shell_types[7] = *xdg_toplevel_interface_instance;
+  xdg_shell_types[8] = *xdg_popup_interface_instance;
+  xdg_shell_types[9] = *xdg_surface_interface_instance;
+  xdg_shell_types[10] = *xdg_positioner_interface_instance;
+  xdg_shell_types[11] = *xdg_toplevel_interface_instance;
+  xdg_shell_types[12] = *wl_seat_interface_instance;
   xdg_shell_types[13] = null;
   xdg_shell_types[14] = null;
   xdg_shell_types[15] = null;
-  xdg_shell_types[16] = *wl_seat_interface;
+  xdg_shell_types[16] = *wl_seat_interface_instance;
   xdg_shell_types[17] = null;
-  xdg_shell_types[18] = *wl_seat_interface;
+  xdg_shell_types[18] = *wl_seat_interface_instance;
   xdg_shell_types[19] = null;
   xdg_shell_types[20] = null;
-  xdg_shell_types[21] = *wl_output_interface;
-  xdg_shell_types[22] = *wl_seat_interface;
+  xdg_shell_types[21] = *wl_output_interface_instance;
+  xdg_shell_types[22] = *wl_seat_interface_instance;
   xdg_shell_types[23] = null;
-  xdg_shell_types[24] = *xdg_positioner_interface;
+  xdg_shell_types[24] = *xdg_positioner_interface_instance;
   xdg_shell_types[25] = null;
 
   xdg_decoration_unstable_v1_types[0] = null;
-  xdg_decoration_unstable_v1_types[1] = *zxdg_toplevel_decoration_v1_interface;
-  xdg_decoration_unstable_v1_types[2] = *xdg_toplevel_interface;
+  xdg_decoration_unstable_v1_types[1] = *zxdg_toplevel_decoration_v1_interface_instance;
+  xdg_decoration_unstable_v1_types[2] = *xdg_toplevel_interface_instance;
 
   wayland_types[0] = null;
   wayland_types[1] = null;
@@ -2424,92 +2424,92 @@ init_wayland_protocol_bindings :: () {
   wayland_types[5] = null;
   wayland_types[6] = null;
   wayland_types[7] = null;
-  wayland_types[8] = *wl_callback_interface;
-  wayland_types[9] = *wl_registry_interface;
-  wayland_types[10] = *wl_surface_interface;
-  wayland_types[11] = *wl_region_interface;
-  wayland_types[12] = *wl_buffer_interface;
+  wayland_types[8] = *wl_callback_interface_instance;
+  wayland_types[9] = *wl_registry_interface_instance;
+  wayland_types[10] = *wl_surface_interface_instance;
+  wayland_types[11] = *wl_region_interface_instance;
+  wayland_types[12] = *wl_buffer_interface_instance;
   wayland_types[13] = null;
   wayland_types[14] = null;
   wayland_types[15] = null;
   wayland_types[16] = null;
   wayland_types[17] = null;
-  wayland_types[18] = *wl_shm_pool_interface;
+  wayland_types[18] = *wl_shm_pool_interface_instance;
   wayland_types[19] = null;
   wayland_types[20] = null;
-  wayland_types[21] = *wl_data_source_interface;
-  wayland_types[22] = *wl_surface_interface;
-  wayland_types[23] = *wl_surface_interface;
+  wayland_types[21] = *wl_data_source_interface_instance;
+  wayland_types[22] = *wl_surface_interface_instance;
+  wayland_types[23] = *wl_surface_interface_instance;
   wayland_types[24] = null;
-  wayland_types[25] = *wl_data_source_interface;
+  wayland_types[25] = *wl_data_source_interface_instance;
   wayland_types[26] = null;
-  wayland_types[27] = *wl_data_offer_interface;
+  wayland_types[27] = *wl_data_offer_interface_instance;
   wayland_types[28] = null;
-  wayland_types[29] = *wl_surface_interface;
+  wayland_types[29] = *wl_surface_interface_instance;
   wayland_types[30] = null;
   wayland_types[31] = null;
-  wayland_types[32] = *wl_data_offer_interface;
-  wayland_types[33] = *wl_data_offer_interface;
-  wayland_types[34] = *wl_data_source_interface;
-  wayland_types[35] = *wl_data_device_interface;
-  wayland_types[36] = *wl_seat_interface;
-  wayland_types[37] = *wl_shell_surface_interface;
-  wayland_types[38] = *wl_surface_interface;
-  wayland_types[39] = *wl_seat_interface;
+  wayland_types[32] = *wl_data_offer_interface_instance;
+  wayland_types[33] = *wl_data_offer_interface_instance;
+  wayland_types[34] = *wl_data_source_interface_instance;
+  wayland_types[35] = *wl_data_device_interface_instance;
+  wayland_types[36] = *wl_seat_interface_instance;
+  wayland_types[37] = *wl_shell_surface_interface_instance;
+  wayland_types[38] = *wl_surface_interface_instance;
+  wayland_types[39] = *wl_seat_interface_instance;
   wayland_types[40] = null;
-  wayland_types[41] = *wl_seat_interface;
+  wayland_types[41] = *wl_seat_interface_instance;
   wayland_types[42] = null;
   wayland_types[43] = null;
-  wayland_types[44] = *wl_surface_interface;
+  wayland_types[44] = *wl_surface_interface_instance;
   wayland_types[45] = null;
   wayland_types[46] = null;
   wayland_types[47] = null;
   wayland_types[48] = null;
   wayland_types[49] = null;
-  wayland_types[50] = *wl_output_interface;
-  wayland_types[51] = *wl_seat_interface;
+  wayland_types[50] = *wl_output_interface_instance;
+  wayland_types[51] = *wl_seat_interface_instance;
   wayland_types[52] = null;
-  wayland_types[53] = *wl_surface_interface;
+  wayland_types[53] = *wl_surface_interface_instance;
   wayland_types[54] = null;
   wayland_types[55] = null;
   wayland_types[56] = null;
-  wayland_types[57] = *wl_output_interface;
-  wayland_types[58] = *wl_buffer_interface;
+  wayland_types[57] = *wl_output_interface_instance;
+  wayland_types[58] = *wl_buffer_interface_instance;
   wayland_types[59] = null;
   wayland_types[60] = null;
-  wayland_types[61] = *wl_callback_interface;
-  wayland_types[62] = *wl_region_interface;
-  wayland_types[63] = *wl_region_interface;
-  wayland_types[64] = *wl_output_interface;
-  wayland_types[65] = *wl_output_interface;
-  wayland_types[66] = *wl_pointer_interface;
-  wayland_types[67] = *wl_keyboard_interface;
-  wayland_types[68] = *wl_touch_interface;
+  wayland_types[61] = *wl_callback_interface_instance;
+  wayland_types[62] = *wl_region_interface_instance;
+  wayland_types[63] = *wl_region_interface_instance;
+  wayland_types[64] = *wl_output_interface_instance;
+  wayland_types[65] = *wl_output_interface_instance;
+  wayland_types[66] = *wl_pointer_interface_instance;
+  wayland_types[67] = *wl_keyboard_interface_instance;
+  wayland_types[68] = *wl_touch_interface_instance;
   wayland_types[69] = null;
-  wayland_types[70] = *wl_surface_interface;
+  wayland_types[70] = *wl_surface_interface_instance;
   wayland_types[71] = null;
   wayland_types[72] = null;
   wayland_types[73] = null;
-  wayland_types[74] = *wl_surface_interface;
+  wayland_types[74] = *wl_surface_interface_instance;
   wayland_types[75] = null;
   wayland_types[76] = null;
   wayland_types[77] = null;
-  wayland_types[78] = *wl_surface_interface;
+  wayland_types[78] = *wl_surface_interface_instance;
   wayland_types[79] = null;
-  wayland_types[80] = *wl_surface_interface;
+  wayland_types[80] = *wl_surface_interface_instance;
   wayland_types[81] = null;
   wayland_types[82] = null;
-  wayland_types[83] = *wl_surface_interface;
+  wayland_types[83] = *wl_surface_interface_instance;
   wayland_types[84] = null;
   wayland_types[85] = null;
-  wayland_types[86] = *wl_surface_interface;
+  wayland_types[86] = *wl_surface_interface_instance;
   wayland_types[87] = null;
   wayland_types[88] = null;
   wayland_types[89] = null;
-  wayland_types[90] = *wl_subsurface_interface;
-  wayland_types[91] = *wl_surface_interface;
-  wayland_types[92] = *wl_surface_interface;
-  wayland_types[93] = *wl_surface_interface;
-  wayland_types[94] = *wl_surface_interface;
+  wayland_types[90] = *wl_subsurface_interface_instance;
+  wayland_types[91] = *wl_surface_interface_instance;
+  wayland_types[92] = *wl_surface_interface_instance;
+  wayland_types[93] = *wl_surface_interface_instance;
+  wayland_types[94] = *wl_surface_interface_instance;
 
 }

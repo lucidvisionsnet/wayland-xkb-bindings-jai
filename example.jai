@@ -215,18 +215,18 @@ streq :: (a: *u8, b: *u8) -> bool #c_call {
 registry_global :: (data: *void, wl_registry: *Wayland.wl_registry, name: u32, iface: *u8, version: u32) #c_call {
   state := cast(*ClientState)data;
 
-  if streq(iface, Wayland.wl_shm_interface.name) {
-    state.wl_shm = Wayland.wl_registry_bind(wl_registry, name, *Wayland.wl_shm_interface, 1);
-  } else if streq(iface, Wayland.wl_compositor_interface.name) {
-    state.wl_compositor = Wayland.wl_registry_bind(wl_registry, name, *Wayland.wl_compositor_interface, 4);
-  } else if streq(iface, Wayland.xdg_wm_base_interface.name) {
-    state.xdg_wm_base = Wayland.wl_registry_bind(wl_registry, name, *Wayland.xdg_wm_base_interface, 1);
+  if streq(iface, Wayland.wl_shm_interface_instance.name) {
+    state.wl_shm = Wayland.wl_registry_bind(wl_registry, name, *Wayland.wl_shm_interface_instance, 1);
+  } else if streq(iface, Wayland.wl_compositor_interface_instance.name) {
+    state.wl_compositor = Wayland.wl_registry_bind(wl_registry, name, *Wayland.wl_compositor_interface_instance, 4);
+  } else if streq(iface, Wayland.xdg_wm_base_interface_instance.name) {
+    state.xdg_wm_base = Wayland.wl_registry_bind(wl_registry, name, *Wayland.xdg_wm_base_interface_instance, 1);
     Wayland.xdg_wm_base_add_listener(state.xdg_wm_base, *xdg_wm_base_listener, state);
-  } else if streq(iface, Wayland.wl_seat_interface.name) {
-    state.wl_seat = Wayland.wl_registry_bind(wl_registry, name, *Wayland.wl_seat_interface, 5);
+  } else if streq(iface, Wayland.wl_seat_interface_instance.name) {
+    state.wl_seat = Wayland.wl_registry_bind(wl_registry, name, *Wayland.wl_seat_interface_instance, 5);
     Wayland.wl_seat_add_listener(state.wl_seat, *wl_seat_listener, state);
-  } else if streq(iface, Wayland.zxdg_decoration_manager_v1_interface.name) {
-    state.xdg_decoration_manager = Wayland.wl_registry_bind(wl_registry, name, *Wayland.zxdg_decoration_manager_v1_interface, 1);
+  } else if streq(iface, Wayland.zxdg_decoration_manager_v1_interface_instance.name) {
+    state.xdg_decoration_manager = Wayland.wl_registry_bind(wl_registry, name, *Wayland.zxdg_decoration_manager_v1_interface_instance, 1);
   }
 }
 

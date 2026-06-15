@@ -3,8 +3,11 @@
 #load "xkb.jai";
 
 libwayland_client   :: #library,system "libwayland-client.so.0";
+libwayland_server   :: #library,system "libwayland-server.so.0";
 
-// Opaque types, listed by hand.
+// Opaque types, listed by hand. You'll have to tune this list to your needs
+// based on which XML protocol definitions you process in the code generation
+// step.
 wl_buffer                   :: struct {}
 wl_callback                 :: struct {}
 wl_compositor               :: struct {}
